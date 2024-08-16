@@ -2,7 +2,7 @@
 
 This repository contains two PHP scripts designed to perform basic arithmetic operations and geometric calculations via the command line. The user needs to specify the type of operation, the operator and the variables to be used.
 
-# Script 1: Basic Arithmetic Operations
+# Calculator.php: Basic Arithmetic Operations
 This script performs basic arithmetic operations such as addition, subtraction, multiplication, division, modulo, and exponentiation.
 
 # Usage
@@ -22,7 +22,7 @@ php script1.php --type=operation --operator=<operator> --param1=<value1> --param
 - **`--param1`**: The first operand (required).
 - **`--param2`**: The second operand (required).
 
-# Script 2: Geometric Shape Calculations
+# Figures.php: Geometric Shape Calculations
 This script calculates the area and perimeter of triangles, squares, and circles.
 
 # Usage
