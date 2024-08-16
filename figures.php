@@ -58,8 +58,8 @@ switch($options["shape"]){
             $result= 4 * $radius;
             $result = round($result,2);
         }
-
         break;
+
      case "circle":
         if ($options["calculation"]=="area") {
             $result= M_PI * $radius * $radius;
@@ -69,7 +69,6 @@ switch($options["shape"]){
             $result= 2 * M_PI * $radius;
             $result = round($result,2);
         }
-        
         break;
    
 }

@@ -26,29 +26,29 @@ $result;
 
 switch($options["operator"]){
     case "plus":
-
         $result = $a + $b;
         break;
-    case "minus":
 
+    case "minus":
         $result = $a - $b;
         break;
-    case "multiply":
 
+    case "multiply":
         $result = $a * $b;
         break;
-    case "divide":
 
+    case "divide":
         $result = $a / $b;
         break;
-    case "modulo":
 
+    case "modulo":
         $result = $a % $b;
         break;
-    case "exponentiation":
 
+    case "exponentiation":
         $result = $a ** $b;
         break;
+        
 }
 
 echo 'Your result is ' . $result;
