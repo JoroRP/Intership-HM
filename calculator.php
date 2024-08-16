@@ -9,6 +9,7 @@ $longopts  = array(
 
 $options = getopt("", $longopts);
 //var_dump($options);
+//hello
 
 $required_options = ['type', 'operator', 'param1', 'param2'];
 
