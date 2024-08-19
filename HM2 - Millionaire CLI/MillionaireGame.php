@@ -231,7 +231,6 @@ function gameQuestions(array $questions, array $prize)
         shuffle($questions[$i]["options"]);
         $correct_answer = array_search($questions[$i]["correct"], $questions[$i]["options"]);
 
-        echo $correct_answer;
 
         for ($j = 0; $j < count($questions[$i]["options"]); $j++) {
             $letter = chr(65 + $j);
