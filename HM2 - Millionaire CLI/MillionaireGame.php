@@ -176,15 +176,12 @@ $scoreboard = [];
 
 do {
     echo "\nAre you ready to play Who Wants to Be a Millionaire?\n\n";
-    
 
     $name = readline("Please enter your name to start - ");
     echo "Let's start the game, " . $name . "!\n\n";
 
-
     $winnings = gameQuestions($questionnaire, $prize);
     $scoreboard[$name] = $winnings;
-
 
     $valid_choice = false;
     while (!$valid_choice) {
@@ -200,15 +197,18 @@ do {
             case "1":
                 $valid_choice = true;
                 break;
+
             case "2":
                 displayScoreboard($scoreboard);
                 $valid_choice = true;
                 break;
+
             case "3":
                 echo "Thank you for playing! Goodbye!\n";
                 $valid_choice = true;
                 $exit = true;
                 break;
+                
             default:
                 echo "Invalid choice. Please enter 1, 2, or 3.\n";
         }
@@ -231,15 +231,12 @@ function gameQuestions(array $questions, array $prize)
         shuffle($questions[$i]["options"]);
         $correct_answer = array_search($questions[$i]["correct"], $questions[$i]["options"]);
 
-        echo $correct_answer;
-
         for ($j = 0; $j < count($questions[$i]["options"]); $j++) {
             $letter = chr(65 + $j);
             echo $letter . ") " . $questions[$i]["options"][$j] . "\n";
         }
 
         $player_answer = strtoupper(readline());
-
 
         if ($player_answer === chr(65 + $correct_answer)) {
             echo "\nCorrect!\n";
@@ -268,7 +265,6 @@ function gameQuestions(array $questions, array $prize)
 
 function displayScoreboard(array $scoreboard)
 {
-
     echo "The current scoreboard for players is:\n";
 
     foreach ($scoreboard as $name => $sum) {
