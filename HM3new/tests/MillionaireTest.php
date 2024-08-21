@@ -7,7 +7,7 @@ require_once __DIR__ . '/../src/MillionaireGame.php';
 
 use PHPUnit\Framework\TestCase;
 
-class MillionaireTest extends TestCase
+final class MillionaireTest extends TestCase
 {
     public function testScoreboard(): void
     {
