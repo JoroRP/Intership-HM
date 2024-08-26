@@ -15,8 +15,8 @@ require __DIR__ . '/MainPanel.php';
 
 $mainPanel = new MainPanel();
 
-//$mainPanel->login();
-$mainPanel->adminMenu();
+$mainPanel->login();
+//$mainPanel->adminMenu();
 
 
 

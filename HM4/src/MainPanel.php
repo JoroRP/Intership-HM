@@ -5,8 +5,6 @@ namespace HM4;
 //require __DIR__ . '/Subject.php';
 //require __DIR__ . '/User.php';
 
-use function Sodium\add;
-
 class MainPanel
 {
     /** @var Subject[] */
@@ -19,27 +17,61 @@ class MainPanel
     {
     }
 
-
-    public function login()
+    public function login(): void
     {
         $adminUser = new User('admin', 'admin123', 'admin', 'Admin Administratov');
-        $this->Users[] = $adminUser;
+
+        $adminExists = false;
+        foreach ($this->Users as $user) {
+            if (strcasecmp($user->getUsername(), $adminUser->getUsername()) === 0) {
+                $adminExists = true;
+                break;
+            }
+        }
+
+        if (!$adminExists) {
+            $this->Users[] = $adminUser;
+        }
 
         for ($i = 3; $i > 0; $i--) {
 
             $username = readline("Enter username- ");
             $password = readline("Enter password- ");
 
-            if ($adminUser->getUsername() == $username && $adminUser->verifyPassword($password)) {
-                echo "Login successful. Welcome, $username!\n";
-                $this->adminMenu();
+            $loggedUser = null;
+            foreach ($this->Users as $user) {
+                if (strcasecmp($user->getUsername(), $username) === 0) {
+                    $loggedUser = $user;
+                    break;
+                }
+            }
 
-            } else if ($i > 0) {
-                echo "Invalid username or password.\nYou have " . ($i - 1) . " tries left.\n";
+            if ($loggedUser && $loggedUser->verifyPassword($password)) {
+                echo "Login successful. Welcome, " . $loggedUser->getName() . "!\n";
+
+                switch ($loggedUser->getRole()) {
+                    case 'admin':
+                        $this->adminMenu();
+                        break;
+                    case 'teacher':
+                        $this->teacherMenu($loggedUser);
+                        break;
+                    case 'student':
+                        $this->studentMenu();
+                        break;
+                    default:
+                        echo "There is an issue with your account. Please contact your admin\n";
+                        exit();
+                }
+            } else {
+                if ($i > 1) {
+                    echo "Invalid username or password. You have " . ($i - 1) . " tries left.\n";
+                } else {
+                    echo "You have made too many incorrect attempts to log in.\n";
+                    exit();
+                }
             }
         }
-        echo "You have made too many incorrect attempts to log in.";
-        exit();
     }
 
     public function adminMenu(): void
@@ -92,9 +124,8 @@ class MainPanel
 
             case '7':
                 echo "Logging out.\n";
-                //$this->login();
+                $this->login();
                 exit();
-                break;
 
             default:
                 echo "Invalid choice. Please try again.\n\n";
@@ -102,8 +133,71 @@ class MainPanel
         }
     }
 
+    public function teacherMenu(User $teacherInfo): void
+    {
+        $assignedSubjects = [];
+        foreach ($this->Subjects as $subject) {
+            foreach ($subject->getTeachers() as $teacher) {
+                if ($teacher->getUsername() === $teacherInfo->getUsername()) {
+                    $assignedSubjects[] = $subject->getName();
+                }
+            }
+        }
 
-    public function createSubject(): void
+        echo "\nTeacher Panel\n";
+        echo "The Subjects you teach are:\n";
+        foreach ($assignedSubjects as $subjectName) {
+            echo "-" . $subjectName . "\n";
+        }
+        echo "\n1. Grade a student\n";
+        echo "2. Log out\n";
+
+        $choice = readline("Please select an option - ");
+
+        switch ($choice) {
+            case '1':
+                $this->gradeStudent($teacherInfo);
+                break;
+
+            case '2':
+                echo "Logging out.\n";
+                $this->login();
+                break;
+
+            default:
+                echo "Invalid choice. Please try again.\n\n";
+                $this->studentMenu();
+        }
+    }
+
+    public
+    function studentMenu(): void
+    {
+        echo "\nStudent Panel\n";
+        echo "Check grades for a subject\n";
+        echo "2. Log out\n";
+
+        $choice = readline("Please select an option - ");
+
+        switch ($choice) {
+            case '1':
+
+                break;
+
+            case '2':
+                echo "Logging out.\n";
+                $this->login();
+                break;
+
+            default:
+                echo "Invalid choice. Please try again.\n\n";
+                $this->teacherMenu();
+        }
+    }
+
+
+    public
+    function createSubject(): void
     {
         while (true) {
             $name = readline("Please enter a name for the subject - ");
@@ -122,7 +216,8 @@ class MainPanel
         }
     }
 
-    public function userCreator($role)
+    public
+    function userCreator($role)
     {
         do {
             $username = readline("Please enter a username for the $role - ");
@@ -197,7 +292,8 @@ class MainPanel
         $this->adminMenu();
     }
 
-    public function removeSubject(): void
+    public
+    function removeSubject(): void
     {
         if (empty($this->Subjects)) {
             echo "No subjects available to remove.\n";
@@ -231,6 +327,28 @@ class MainPanel
             unset($this->Subjects[$subjectIndex]);
             $this->Subjects = array_values($this->Subjects);
 
+            $connectedTeachers = $removedSubject->getTeachers();
+            $connectedStudents = $removedSubject->getStudents();
+
+            foreach ($connectedTeachers as $teacher) {
+                foreach ($this->Users as $userIndex => $user) {
+                    if ($teacher->getUsername() === $user->getUsername()) {
+                        unset($this->Users[$userIndex]);
+
+                    }
+                }
+            }
+
+            foreach ($connectedStudents as $student) {
+                foreach ($this->Users as $userIndex => $user) {
+                    if ($student->getUsername() === $user->getUsername()) {
+                        unset($this->Users[$userIndex]);
+                    }
+                }
+            }
+
+            $this->Users = array_values($this->Users);
+
             echo "Subject " . $removedSubject->getName() . " was removed successfully.\n";
             $this->adminMenu();
         } else {
@@ -240,7 +358,8 @@ class MainPanel
 
     }
 
-    public function removeUser($role): void
+    public
+    function removeUser($role): void
     {
         if (empty($this->Users)) {
             echo "No " . $role . "s" . " available to remove.\n";
@@ -315,5 +434,21 @@ class MainPanel
         $this->adminMenu();
     }
 
+    public function gradeStudent(User $teacherInfo): void
+    {
+        $students = [];
+        foreach ($this->Users as $user) {
+            if ($user->getRole() === 'student') {
+                $students[] = $user;
+            }
+        }
+
+        if (empty($students)) {
+            echo "No students available to grade.\n";
+            $this->teacherMenu($teacherInfo);
+            return;
+        }
+
+    }
 
 }
