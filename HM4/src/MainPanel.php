@@ -179,11 +179,11 @@ class MainPanel
         $newUser = new User($username, $password, $role, $name);
         $this->Users[] = $newUser;
 
-        if ($role == "teacher"){
+        if ($role == "teacher") {
             foreach ($selectedSubjects as $subject) {
                 $subject->setTeachers(array_merge($subject->getTeachers(), [$newUser]));
             }
-        } else if ($role == "student"){
+        } else if ($role == "student") {
             foreach ($selectedSubjects as $subject) {
                 $subject->setStudents(array_merge($subject->getStudents(), [$newUser]));
             }
@@ -249,7 +249,7 @@ class MainPanel
 
         echo "Available " . $role . "s:\n";
         foreach ($this->Users as $user) {
-            if($user->getRole() == $role){
+            if ($user->getRole() == $role) {
                 echo '- ' . $user->getName() . " with username " . $user->getUsername() . "\n";
             }
         }
@@ -266,7 +266,7 @@ class MainPanel
 
         $userIndex = null;
         foreach ($this->Users as $index => $user) {
-            if($user->getRole() == $role){
+            if ($user->getRole() == $role) {
                 if (strcasecmp($user->getName(), $usernameToRemove) === 0) {
                     $userIndex = $index;
                     break;
@@ -314,8 +314,6 @@ class MainPanel
 
         $this->adminMenu();
     }
-
-
 
 
 }
