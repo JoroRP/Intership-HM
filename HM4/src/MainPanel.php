@@ -446,7 +446,6 @@ class MainPanel
         if (empty($students)) {
             echo "No students available to grade.\n";
             $this->teacherMenu($teacherInfo);
-            return;
         }
 
     }
