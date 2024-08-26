@@ -1,0 +1,54 @@
+<?php declare(strict_types=1);
+
+namespace HM4;
+
+class Subject
+{
+    private string $name;
+    /** @var User[] */
+    private array $teachers;
+    /** @var User[] */
+    private array $students;
+
+    /**
+     * @param string $name
+     */
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+        $this->teachers = [];
+        $this->students = [];
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getTeachers(): array
+    {
+        return $this->teachers;
+    }
+
+    public function setTeachers(array $teachers): void
+    {
+        $this->teachers = $teachers;
+    }
+
+    public function getStudents(): array
+    {
+        return $this->students;
+    }
+
+    public function setStudents(array $students): void
+    {
+        $this->students = $students;
+    }
+
+
+}
