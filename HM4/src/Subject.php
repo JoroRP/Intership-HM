@@ -10,6 +10,8 @@ class Subject
     /** @var User[] */
     private array $students;
 
+    private array $grades;
+
     /**
      * @param string $name
      */
@@ -18,6 +20,7 @@ class Subject
         $this->name = $name;
         $this->teachers = [];
         $this->students = [];
+        $this->grades = [];
     }
 
     public function getName(): string
@@ -48,6 +51,16 @@ class Subject
     public function setStudents(array $students): void
     {
         $this->students = $students;
+    }
+
+    public function getGrades(): array
+    {
+        return $this->grades;
+    }
+
+    public function setGrades(array $grades): void
+    {
+        $this->grades = $grades;
     }
 
 

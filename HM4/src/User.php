@@ -7,7 +7,7 @@ class User
     private string $password;
     private string $role;
     private string $name;
-    private int $grade;
+
 
     /**
      * @param string $username
@@ -21,7 +21,6 @@ class User
         $this->password = password_hash($password, PASSWORD_BCRYPT);
         $this->role = $role;
         $this->name = $name;
-        $this->grade = 0;
     }
 
 
@@ -69,18 +68,6 @@ class User
     {
         $this->name = $name;
     }
-
-    public function getGrade(): int
-    {
-        return $this->grade;
-    }
-
-    public function setGrade(int $grade): void
-    {
-        $this->grade = $grade;
-    }
-
-
 
 
 }

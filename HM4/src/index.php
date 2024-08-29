@@ -10,8 +10,6 @@ require __DIR__ . '/Subject.php';
 require __DIR__ . '/User.php';
 require __DIR__ . '/MainPanel.php';
 
-//$adminUser = new User('admin', 'admin123','admin');
-
 
 $mainPanel = new MainPanel();
 

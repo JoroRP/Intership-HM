@@ -361,20 +361,24 @@ class MainPanel
     public
     function removeUser($role): void
     {
-        if (empty($this->Users)) {
-            echo "No " . $role . "s" . " available to remove.\n";
-            $this->adminMenu();
-        }
+
+        $found = false;
 
         echo "Available " . $role . "s:\n";
         foreach ($this->Users as $user) {
             if ($user->getRole() == $role) {
                 echo '- ' . $user->getName() . " with username " . $user->getUsername() . "\n";
+                $found = true;
             }
         }
 
+        if ($found === false) {
+            echo "No " . $role . "s found.\n";
+            $this->adminMenu();
+        }
+
         userCycle:
-        $usernameInput = readline("Enter the username of the  you want to remove - ");
+        $usernameInput = readline("Enter the username of the" . $role . "you want to remove - ");
         $usernameToRemove = trim($usernameInput);
 
 
@@ -391,7 +395,6 @@ class MainPanel
                     break;
                 }
             }
-
         }
 
         if ($userIndex !== null) {
