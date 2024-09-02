@@ -3,9 +3,12 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/HM3new/src" isTestSource="false" packagePrefix="HM4\" />
+      <sourceFolder url="file://$MODULE_DIR$/HM3new/src" isTestSource="false" packagePrefix="GeorgiRadoslavov\Hm3new\" />
       <sourceFolder url="file://$MODULE_DIR$/HM3new/tests" isTestSource="true" packagePrefix="HM4\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/Lecture4/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/Lecture4/tests" isTestSource="true" packagePrefix="App\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/HM4/src" isTestSource="false" packagePrefix="HM4\" />
+      <sourceFolder url="file://$MODULE_DIR$/HM4/tests" isTestSource="true" packagePrefix="HM4\Tests\" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/myclabs/deep-copy" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/nikic/php-parser" />
