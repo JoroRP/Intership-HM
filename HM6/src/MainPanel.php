@@ -13,6 +13,8 @@ class MainPanel
     /** @var User[] */
     public array $Users = [];
 
+    public array $grades = [];
+
     public function __construct()
     {
     }
@@ -29,6 +31,11 @@ class MainPanel
         }
     }
 
+    public function getUsers(): array
+    {
+        return $this->Users;
+    }
+
     public function saveUsers(): void
     {
         $data = serialize($this->Users);
@@ -43,6 +50,8 @@ class MainPanel
     public function addAdmin(): void
     {
         $adminUser = new User('admin', 'admin123', 'admin', 'Admin Administratov');
+        $subject = new Subject("History");
+        $subject1 = new Subject("Maths");
         foreach ($this->Users as $user) {
             if (strcasecmp($user->getUsername(), $adminUser->getUsername()) === 0) {
                 return;
@@ -50,6 +59,10 @@ class MainPanel
         }
         $this->Users[] = $adminUser;
         $this->saveUsers();
+
+        $this->Subjects[] = $subject;
+        $this->Subjects[] = $subject1;
+        $this->saveSubjects();
     }
 
     public function authenticateUser(string $username, string $password): bool
@@ -308,7 +321,7 @@ class MainPanel
         $this->saveSubjects();
     }
 
-    public function gradeStudent(string $subjectName, string $username, float $grade): void
+    public function gradeStudent(string $subjectName, string $username, int $grade): void
     {
         $message = '';
 
@@ -317,8 +330,20 @@ class MainPanel
                 $students = array_map(fn($student) => $student->getUsername(), $subject->getStudents());
 
                 if (in_array($username, $students, true)) {
-                    $subject->addGrade($username, $grade);
+                    $currentGrades = $subject->getGrades();
+
+                    if (!isset($currentGrades[$username])) {
+                        $currentGrades[$username] = [];
+                    } elseif (!is_array($currentGrades[$username])) {
+                        $currentGrades[$username] = [$currentGrades[$username]];
+                    }
+
+                    $currentGrades[$username][] = $grade;
+
+                    $subject->setGrades($currentGrades);
+
                     $this->saveSubjects();
+
                     $message = '<div class="alert alert-success">Grade has been added successfully.</div>';
                     $_SESSION['admin_message'] = $message;
                 } else {
@@ -328,6 +353,7 @@ class MainPanel
                 return;
             }
         }
+
         $message = '<div class="alert alert-danger">Subject not found.</div>';
         $_SESSION['admin_message'] = $message;
     }
