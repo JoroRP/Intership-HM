@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<link href="CSS/custom.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
 <?php include 'navbar.html' ?>
 
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		<div class="card-header">
 			<h2>Create a <?php echo htmlspecialchars($role); ?></h2>
 		</div>
-		<form method="post" action="create-user.php" class="m-3">
+		<form method="post" action="create-user.php?role=<?php echo htmlspecialchars($role); ?>" class="m-3">
 			<input type="hidden" name="role" value="<?php echo htmlspecialchars($role); ?>">
 			<div class="mb-3">
 				<label for="username" class="form-label">Username</label>
@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</form>
 	</div>
 </div>
+
+<?php include 'footer.html' ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

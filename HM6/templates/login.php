@@ -34,10 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else if ($_SESSION['role'] === 'student') {
                 header("Location: homepage-student.php");
                 exit();
-            } else {
-                $errorMessage = "Invalid username or password.";
             }
         }
+    } else {
+        $errorMessage = "Invalid username or password.";
     }
 }
 ?>
@@ -56,13 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
 <main class="container form-signin w-100 m-auto">
-	<form action="login.php" class="p-2 rounded text-body-emphasis bg-body-secondary" style="margin: -80px"
+	<div class="container-fluid text-center">
+		<img class="d-block mb-3 mx-auto" src="images/graduation-cap.png" alt="" width="72" height="72">
+	</div>
+
+	<form action="login.php" class="p-2 rounded text-body-emphasis shadow-lg" style="margin: 0px -70px"
 		  method="post">
 		<div>
-			<img class="d-block mt-1 mb-3 mx-auto" src="images/graduation-cap.png" alt="" width="72" height="72">
+
 			<h3 class=" mb-3 fw-normal text-center">Sign in to ®Daskalo</h3>
 			<h5 class=" mb-3 fw-normal text-center">(Not affiliated to Shkolo in any way!)</h5>
-			
+
 			<div class="form-floating">
 				<input type="text" class="form-control" id="floatingInput" name="username" placeholder="">
 				<label for="floatingInput">Username</label>
@@ -75,10 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($errorMessage): ?>
 				<div class="alert alert-danger" role="alert">
                     <?php echo htmlspecialchars($errorMessage); ?>
-                    <?php echo htmlspecialchars($_SESSION['role']); ?>
 				</div>
             <?php endif; ?>
-			
+
 			<button class="btn btn-primary w-100 my-5 py-2" type="submit">Sign in</button>
 		</div>
 	</form>

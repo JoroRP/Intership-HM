@@ -38,12 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action'])) {
 	<link href="CSS/custom.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
 <?php include 'navbar.html' ?>
 
 <div class="mt-3 container-fluid">
-	<h1 class="mb-5">Welcome, <?php echo htmlspecialchars($name) ?>!</h1>
 
     <?php if (isset($_SESSION['admin_message'])): ?>
 		<div id="message-container" style="margin-top: -2.5rem">
@@ -142,6 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action'])) {
 	</div>
 
 </div>
+
+<?php include 'footer.html' ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

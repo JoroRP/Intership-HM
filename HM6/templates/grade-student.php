@@ -15,17 +15,28 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'teacher') {
 }
 
 $mainPanel->loadSubjects();
+$mainPanel->loadUsers();
+
 $subjects = $mainPanel->getSubjects();
+$users = $mainPanel->getUsers();
+
+$students = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subjectName = $_POST['subject'] ?? '';
     $username = $_POST['username'] ?? '';
     $grade = (float)($_POST['grade'] ?? 0);
 
-    if (empty($subjectName) || empty($username) || $grade < 2 || $grade > 6) {
-        echo '<div class="alert alert-danger">Invalid input. Please check the details and try again.</div>';
-    } else {
-        $mainPanel->gradeStudent($subjectName, $username, $grade);
+    $mainPanel->gradeStudent($subjectName, $username, $grade);
+
+}
+
+$subjectName = $_GET['subject'] ?? '';
+if ($subjectName) {
+    foreach ($subjects as $subject) {
+        if ($subject->getName() === $subjectName) {
+            $students = array_map(fn($student) => $student->getUsername(), $subject->getStudents());
+        }
     }
 }
 
@@ -44,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
 
-<?php include 'navbar-teacher.html' ?>
+<?php include 'navbar-teacher.html'; ?>
 
 <div class="container mt-5">
     <?php if (isset($_SESSION['admin_message'])): ?>
@@ -64,9 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }, 4000);
 		</script>
-
     <?php endif; ?>
-
+	
 	<div class="card shadow-lg mb-4 mx-auto" style="width: 50rem;">
 		<div class="card-header">
 			<h2>Grade Student</h2>
@@ -76,30 +86,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				<div class="mb-3">
 					<label for="subject" class="form-label">Select Subject</label>
 					<select name="subject" id="subject" class="form-select" required>
+						<option value="" disabled selected>Select subject</option>
                         <?php foreach ($subjects as $subject): ?>
-							<option value="<?php echo htmlspecialchars($subject->getName()); ?>">
+							<option value="<?php echo htmlspecialchars($subject->getName()); ?>"
+                                <?php echo isset($subjectName) && $subjectName === $subject->getName() ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($subject->getName()); ?>
 							</option>
                         <?php endforeach; ?>
 					</select>
 				</div>
-
+				
 				<div class="mb-3">
-					<label for="username" class="form-label">Student Username</label>
-					<input type="text" name="username" id="username" class="form-control" required>
+					<label for="username" class="form-label">Select Student</label>
+					<select name="username" id="username" class="form-select" required>
+						<option value="" disabled selected>Select student</option>
+                        <?php foreach ($users as $user): ?>
+                            <?php if ($user->getRole() === 'student'): ?>
+								<option value="<?php echo htmlspecialchars($user->getUsername()); ?>">
+                                    <?php echo htmlspecialchars($user->getName()) . " (" . htmlspecialchars($user->getUsername()) . ")"; ?>
+								</option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+					</select>
 				</div>
-
+				
 				<div class="mb-3">
 					<label for="grade" class="form-label">Grade</label>
-					<input type="number" step="1" name="grade" id="grade" class="form-control" min="2" max="6"
+					<input type="number" step="0.1" name="grade" id="grade" class="form-control" min="2" max="6"
 						   required>
 				</div>
-
+				
 				<button type="submit" class="btn btn-primary">Submit Grade</button>
 			</form>
 		</div>
 	</div>
 </div>
+
+<?php include 'footer.html' ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

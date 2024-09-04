@@ -22,17 +22,26 @@ $name = $_SESSION['name'];
 $studentInfo = new User($username, '', $role, $name);
 
 
-$studentGradesHtml = '';
+$studentGradesToHtml = '';
 foreach ($mainPanel->getSubjects() as $subject) {
     $subjectName = htmlspecialchars($subject->getName());
     $grades = $subject->getGrades();
+    $enrolledSubject = $subject->getStudents();
 
     if (isset($grades[$username])) {
         $studentGrades = $grades[$username];
         $gradesText = is_array($studentGrades) ? implode(', ', $studentGrades) : $studentGrades;
-        $studentGradesHtml .= '<tr><td>' . $subjectName . '</td><td>' . htmlspecialchars($gradesText) . '</td></tr>';
-    }
 
+        $studentGradesToHtml .= '<tr><td>' . $subjectName . '</td><td>' . htmlspecialchars($gradesText) . '</td></tr>';
+
+    } else {
+
+        foreach ($subject->getStudents() as $student) {
+            if ($student->getUsername() === $studentInfo->getUsername()) {
+                $studentGradesToHtml .= '<tr><td>' . $subjectName . '</td><td></td></tr>';
+            }
+        }
+    }
 }
 
 ?>
@@ -49,12 +58,11 @@ foreach ($mainPanel->getSubjects() as $subject) {
 	<link href="CSS/custom.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
 <?php include 'navbar-student.html'; ?>
 
 <div class="mt-3 container-fluid">
-	<h1 class="mb-5">Welcome, <?php echo htmlspecialchars($name); ?>!</h1>
 
 	<div class="card shadow-lg mb-4 mx-auto" style="width: 35rem;">
 		<div class="card-header">
@@ -69,13 +77,15 @@ foreach ($mainPanel->getSubjects() as $subject) {
 				</tr>
 				</thead>
 				<tbody>
-                <?php echo $studentGradesHtml; ?>
+                <?php echo $studentGradesToHtml; ?>
 				</tbody>
 			</table>
 		</div>
 	</div>
 
 </div>
+
+<?php include 'footer.html' ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

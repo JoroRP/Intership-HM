@@ -20,9 +20,24 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNav">
-			<ul class="navbar-nav ms-auto">
+			<ul class="navbar-nav ms-auto" style="margin-right: 8rem">
 				<li class="nav-item">
-					<a class="nav-link" href="login.php">Logout</a>
+					<span class=""></span>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#" id="userName">
+						<?php echo htmlspecialchars($_SESSION['username']); ?>
+					</a>
+				</li>
+				
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+					   data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="bi bi-person-circle"></i>
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li><a class="dropdown-item" href="login.php">Logout</a></li>
+					</ul>
 				</li>
 			</ul>
 		</div>

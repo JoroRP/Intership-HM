@@ -48,12 +48,11 @@ foreach ($mainPanel->getSubjects() as $subject) {
 	<link href="CSS/custom.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 
 <?php include 'navbar-teacher.html' ?>
 
 <div class="mt-3 container-fluid">
-	<h1 class="mb-5">Welcome, <?php echo htmlspecialchars($name); ?>!</h1>
 
 	<div class="card shadow-lg mb-4 mx-auto" style="width: 35rem; position: ">
 		<div class="card-header">
@@ -97,6 +96,8 @@ foreach ($mainPanel->getSubjects() as $subject) {
 	</div>
 
 </div>
+
+<?php include 'footer.html' ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
