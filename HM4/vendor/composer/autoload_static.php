@@ -16,9 +16,10 @@ class ComposerStaticInit79a2cb576ed77686826ee69c05dfb72b
         array (
             'PhpParser\\' => 10,
         ),
-        'G' => 
+        'H' => 
         array (
-            'GeorgiRadoslavov\\Hm4\\' => 21,
+            'HM4\\Tests\\' => 10,
+            'HM4\\' => 4,
         ),
         'D' => 
         array (
@@ -31,7 +32,11 @@ class ComposerStaticInit79a2cb576ed77686826ee69c05dfb72b
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'GeorgiRadoslavov\\Hm4\\' => 
+        'HM4\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
+        'HM4\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

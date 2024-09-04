@@ -36,6 +36,10 @@ class MainPanel
         for ($i = 3; $i > 0; $i--) {
 
             $username = readline("Enter username- ");
+            if ($username === "terminate") {
+                echo "Exiting the program.";
+                exit();
+            }
             $password = readline("Enter password- ");
 
             $loggedUser = null;
@@ -57,7 +61,7 @@ class MainPanel
                         $this->teacherMenu($loggedUser);
                         break;
                     case 'student':
-                        $this->studentMenu();
+                        $this->studentMenu($loggedUser);
                         break;
                     default:
                         echo "There is an issue with your account. Please contact your admin\n";
@@ -170,18 +174,17 @@ class MainPanel
         }
     }
 
-    public
-    function studentMenu(): void
+    public function studentMenu(User $studentInfo): void
     {
         echo "\nStudent Panel\n";
-        echo "Check grades for a subject\n";
+        echo "1. Check your grades\n";
         echo "2. Log out\n";
 
         $choice = readline("Please select an option - ");
 
         switch ($choice) {
             case '1':
-
+                $this->viewGrades($studentInfo);
                 break;
 
             case '2':
@@ -191,7 +194,7 @@ class MainPanel
 
             default:
                 echo "Invalid choice. Please try again.\n\n";
-                $this->teacherMenu();
+                $this->studentMenu();
         }
     }
 
@@ -439,18 +442,107 @@ class MainPanel
 
     public function gradeStudent(User $teacherInfo): void
     {
-        $students = [];
-        foreach ($this->Users as $user) {
-            if ($user->getRole() === 'student') {
-                $students[] = $user;
+
+        $assignedSubjects = [];
+        foreach ($this->Subjects as $subject) {
+            foreach ($subject->getTeachers() as $teacher) {
+                if ($teacher->getUsername() === $teacherInfo->getUsername()) {
+                    $assignedSubjects[] = $subject;
+                }
             }
         }
 
-        if (empty($students)) {
-            echo "No students available to grade.\n";
+        if (empty($assignedSubjects)) {
+            echo "You are not assigned to any subjects.\n";
             $this->teacherMenu($teacherInfo);
+            return;
         }
 
+        echo "Subjects you are assigned to:\n";
+        foreach ($assignedSubjects as $index => $subject) {
+            echo ($index + 1) . ". " . $subject->getName() . "\n";
+        }
+
+        $subjectChoice = readline("Select a subject to grade (enter number) - ");
+        $subjectIndex = (int)$subjectChoice - 1;
+
+        if ($subjectIndex < 0 || $subjectIndex >= count($assignedSubjects)) {
+            echo "Invalid choice. Please try again.\n";
+            $this->gradeStudent($teacherInfo);
+            return;
+        }
+
+        $subject = $assignedSubjects[$subjectIndex];
+        $students = $subject->getStudents();
+
+        if (empty($students)) {
+            echo "No students to grade in this subject.\n";
+            $this->teacherMenu($teacherInfo);
+            return;
+        }
+
+        echo "Students in this subject:\n";
+        foreach ($students as $index => $student) {
+            echo ($index + 1) . ". " . $student->getName() . " (Username: " . $student->getUsername() . ")\n";
+        }
+
+        $studentChoice = readline("Select a student to grade (enter number) - ");
+        $studentIndex = (int)$studentChoice - 1;
+
+        if ($studentIndex < 0 || $studentIndex >= count($students)) {
+            echo "Invalid choice. Please try again.\n";
+            $this->gradeStudent($teacherInfo);
+            return;
+        }
+
+        teacherCycle:
+        $student = $students[$studentIndex];
+        $newGrade = readline("Enter grade for " . $student->getName() . " - ");
+
+        if ($newGrade < 2 || $newGrade > 6) {
+            echo "Grade must be between 2 and 6\n";
+            goto teacherCycle;
+        }
+
+        $grades = $subject->getGrades();
+        if (isset($grades[$student->getUsername()])) {
+            $grades[$student->getUsername()] .= ', ' . $newGrade;
+        } else {
+            $grades[$student->getUsername()] = $newGrade;
+        }
+
+        $subject->setGrades($grades);
+
+        echo "Grade assigned successfully.\n";
+        $this->teacherMenu($teacherInfo);
+    }
+
+
+    public function viewGrades(User $studentInfo): void
+    {
+        $enrolledSubjects = [];
+        foreach ($this->Subjects as $subject) {
+            foreach ($subject->getStudents() as $student) {
+                if ($student->getUsername() === $studentInfo->getUsername()) {
+                    $enrolledSubjects[] = $subject;
+                }
+            }
+        }
+
+        if (empty($enrolledSubjects)) {
+            echo "You are not assigned to any subjects.\n";
+            $this->studentMenu($studentInfo);
+            return;
+        }
+
+        echo "Your grades, sorted by Subject:\n";
+        foreach ($enrolledSubjects as $subject) {
+            $grades = $subject->getGrades();
+            $grade = $grades[$studentInfo->getUsername()] ?? 'No grade assigned';
+            echo "- " . $subject->getName() . ": " . $grade . "\n";
+        }
+
+        $this->studentMenu($studentInfo);
     }
 
 }

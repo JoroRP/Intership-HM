@@ -10,7 +10,7 @@ class Subject
     /** @var User[] */
     private array $students;
 
-    private array $grades;
+    private array $grades = [];
 
     /**
      * @param string $name
