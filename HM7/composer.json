@@ -1,0 +1,16 @@
+{
+  "name": "georgi.radoslavov/hm7",
+  "autoload": {
+    "psr-4": {
+      "HM7\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HM7\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.3"
+  }
+}
