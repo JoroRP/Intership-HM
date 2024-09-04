@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace HM7;
+
 header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];
