@@ -13,8 +13,6 @@ class MainPanel
     /** @var User[] */
     public array $Users = [];
 
-    public array $grades = [];
-
     public function __construct()
     {
     }

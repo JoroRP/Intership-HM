@@ -51,7 +51,7 @@ $conn->close();
 				<td><?php echo htmlspecialchars($team['city']); ?></td>
 				<td>
 					<a href="edit-team.php?id=<?php echo $team['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-					<a href="delete_team.php?id=<?php echo $team['id']; ?>" class="btn btn-danger btn-sm"
+					<a href="delete-team.php?id=<?php echo $team['id']; ?>" class="btn btn-danger btn-sm"
 					   onclick="return confirm('Are you sure you want to delete this team?');">Delete</a>
 					<a href="players.php?team_id=<?php echo $team['id']; ?>" class="btn btn-secondary btn-sm">Manage
 						Players</a>

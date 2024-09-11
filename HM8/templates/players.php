@@ -92,7 +92,7 @@ $conn->close();
 				</td>
 				<td>
 					<a href="edit-player.php?id=<?php echo $player['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-					<a href="delete_player.php?id=<?php echo $player['id']; ?>" class="btn btn-danger btn-sm"
+					<a href="delete-player.php?id=<?php echo $player['id']; ?>" class="btn btn-danger btn-sm"
 					   onclick="return confirm('Are you sure you want to delete this player?');">Delete</a>
 				</td>
 			</tr>

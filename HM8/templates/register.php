@@ -3,11 +3,7 @@
 require '../vendor/autoload.php';
 require '../src/database.php';
 
-use HM8\FootballService;
-
 session_start();
-
-$footballService = new FootballService();
 
 $errorMessage = '';
 
@@ -30,13 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $errorMessage = "Username already taken.";
         } else {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             $stmt = $conn->prepare("INSERT INTO Users (username, password, name) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $username, $hashedPassword, $name);
 
             if ($stmt->execute()) {
                 $_SESSION['user_id'] = $conn->insert_id;
-                header("Location: index.php");
+                header("Location: homepage.php");
                 exit();
             } else {
                 $errorMessage = "Registration failed. Please try again.";

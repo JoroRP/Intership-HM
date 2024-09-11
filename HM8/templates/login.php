@@ -3,13 +3,9 @@
 require '../vendor/autoload.php';
 require '../src/database.php';
 
-use HM8\FootballService;
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-$footballService = new FootballService();
 
 $errorMessage = '';
 

@@ -17,7 +17,6 @@ if ($path === '/login' && $method === 'POST') {
 }
 
 if ($path === '/logout' && $method === 'POST') {
-    $_SESSION = [];
 
     session_destroy();
     echo json_encode(['status' => 'logged out']);
@@ -138,11 +137,13 @@ function updateTeacher(): void
 {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (!isset($data['id']) || !isset($data['name']) || !isset($data['subject']) || !isset($data['email'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid input. Please provide valid JSON format']);
-        return;
-    }
+    if (isset($data['id']))
+
+        if (!isset($data['name']) || !isset($data['subject']) || !isset($data['email'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid input. Please provide valid JSON format']);
+            return;
+        }
 
     $teachers = loadTeachersFromFile();
     foreach ($teachers as &$teacher) {
