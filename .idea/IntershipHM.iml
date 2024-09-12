@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/HM4/src" isTestSource="false" packagePrefix="HM4\" />
       <sourceFolder url="file://$MODULE_DIR$/HM4/tests" isTestSource="true" packagePrefix="HM4\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/HM9/ApiCRUD/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/HM9new/ApiCRUD/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/myclabs/deep-copy" />
       <excludeFolder url="file://$MODULE_DIR$/HM3/vendor/nikic/php-parser" />
