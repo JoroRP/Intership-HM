@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Genre: {{ genre.name }}{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <h1 class="mb-4">Edit Genre: {{ genre.name }}</h1>
+
+        {{ form_start(form) }}
+
+        <div class="mb-3">
+            {{ form_label(form.name, 'Genre Name', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description, 'Genre Description', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        
+        <a href="{{ path('genre_index') }}" class="btn btn-secondary">Cancel</a>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

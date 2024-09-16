@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Author{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <h1 class="mb-4">Add a New Author</h1>
+
+        {{ form_start(form) }}
+
+        <div class="mb-3">
+            {{ form_label(form.name, 'Author Name', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.birthYear, 'Birth Year', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.birthYear, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.birthYear) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.nationality, 'Nationality', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.nationality, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.nationality) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Author</button>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
