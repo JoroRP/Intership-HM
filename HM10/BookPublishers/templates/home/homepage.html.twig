@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home - Book Publishing{% endblock %}
+
+{% block body %}
+    <section class="hero bg-dark text-white text-center d-flex justify-content-center align-items-center"
+             style="background-image: url('{{ asset('images/libraryImage.jpg') }}'); background-size: cover; background-position: center; height: 500px;">
+        <div class="container">
+            <h1 class="display-4">Discover Amazing Books</h1>
+            <p class="lead">Explore our wide collection of books from various genres. Find your next favorite read,
+                curated by expert editors and renowned authors.</p>
+        </div>
+    </section>
+
+    <section class="featured-books py-5">
+        <div class="container">
+            <div class="row">
+                {% for book in books %}
+                    <div class="col-md-4">
+                        <div class="card">
+                            <img src="{{ asset('images/images1.png') }}" class="card-img-top"
+                                 alt="{{ book.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.title }}</h5>
+                                <p class="card-text">
+                                    Genre:
+                                    {% for genre in book.genre %}
+                                        {{ genre.name }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <a href="#" class="btn btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
