@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile - Book Publishing{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Your Profile</h1>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="card-title"> Hey, {{ app.user.username }}!</h3>
+                <p><strong>Username:</strong> {{ app.user.username }}</p>
+                <p><strong>Username:</strong> {{ app.user.email }}</p>
+                <p><strong>Your current access:</strong></p>
+                <ul>
+                    {% if 'ROLE_ADMIN' in app.user.roles %}
+                        <li>Admin Level</li>
+                    {% endif %}
+                    {% if 'ROLE_PUBLISHER' in app.user.roles %}
+                        <li>Blog management level</li>
+                    {% endif %}
+                    {% if 'ROLE_COMMENTER' in app.user.roles %}
+                        <li>Commenter</li>
+                    {% endif %}
+                </ul>
+
+                <hr>
+
+                <h5>Update Your Information:</h5>
+
+                {% for flash_message in app.flashes('success') %}
+                    <div class="alert alert-success">{{ flash_message }}</div>
+                {% endfor %}
+
+                {{ form_start(form) }}
+
+                <div class="form-floating mb-3">
+                    {{ form_widget(form.username, {'attr': {'placeholder': 'Username', 'class': 'form-control'}}) }}
+                    <label for="username">Username</label>
+                    {{ form_errors(form.username) }}
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form_widget(form.email, {'attr': {'placeholder': 'Email', 'class': 'form-control'}}) }}
+                    <label for="email">Email</label>
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <button class="btn btn-primary mt-3" type="submit">Update Profile</button>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

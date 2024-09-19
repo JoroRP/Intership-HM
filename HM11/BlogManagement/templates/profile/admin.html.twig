@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel - Manage Users{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Manage Users</h1>
+        </div>
+
+        {% for flash_message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        {% for flash_message in app.flashes('danger') %}
+            <div class="alert alert-danger">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+
+        <form method="get">
+            <div class="form-group mb-3">
+                <label for="user" class="form-label"><strong>Select a User:</strong></label>
+                <select id="user" name="user" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Select a User --</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}"
+                                {% if selectedUser and user.id == selectedUser.id %}selected{% endif %}>
+                            {{ user.username }} ({{ user.email }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        {% if selectedUser %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{{ selectedUser.username }}</h3>
+                    <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+                    <p><strong>Current Roles:</strong> {{ selectedUser.roles|join(', ') }}</p>
+                    <hr>
+
+                    <h5>Update User Roles:</h5>
+
+                    {{ form_start(form, {'attr': {'class': 'form'}}) }}
+
+                    {% if form_errors(form.roles) %}
+                        <div class="alert alert-danger">
+                            {{ form_errors(form.roles) }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        {% for child in form.roles %}
+                            <div class="form-check form-check-inline">
+                                {{ form_widget(child, {'attr': {'class': 'form-check-input' ~ (child.vars.valid ? '' : ' is-invalid')}}) }}
+                                {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="btn btn-primary mt-2" type="submit">Update Roles</button>
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">Please select a user to view and modify their roles.</div>
+        {% endif %}
+
+    </div>
+{% endblock %}
