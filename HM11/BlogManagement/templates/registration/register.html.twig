@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    <main class="form-signin w-100 m-auto text-center">
+        <div class="container d-flex justify-content-center align-items-center vh-100">
+            <div class="col-lg-4 col-md-6">
+                <form method="post">
+                    <h1 class="h3 mb-3 fw-normal">Register</h1>
+
+                    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                    <div class="form-floating">
+                        {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': 'Username'}}) }}
+                        {{ form_label(registrationForm.username) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.username) }}
+                        </div>
+                    </div>
+
+                    <div class="form-floating mt-3">
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                        {{ form_label(registrationForm.email) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+                    </div>
+
+                    <div class="form-floating mt-3">
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Password'}}) }}
+                        {{ form_label(registrationForm.plainPassword.first) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.plainPassword.first) }}
+                        </div>
+                    </div>
+
+                    <div class="form-floating mt-3">
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirm Password'}}) }}
+                        {{ form_label(registrationForm.plainPassword.second) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.plainPassword.second) }}
+                        </div>
+                    </div>
+
+                    <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Register</button>
+
+                    <p class="mt-5 mb-3 text-muted">&copy;Blogs 2024</p>
+
+                    {{ form_end(registrationForm) }}
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}

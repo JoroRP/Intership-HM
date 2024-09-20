@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+    <main class="form-signin w-100 m-auto text-center">
+        <div class="container d-flex justify-content-center align-items-center vh-100">
+            <div class="col-lg-4 col-md-6">
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="alert alert-info">
+                            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    {% endif %}
+
+                    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+                    <div class="form-floating">
+                        <input type="text" value="{{ last_username }}" name="username" id="inputUsername"
+                               class="form-control"
+                               placeholder="Username" autocomplete="username" required autofocus>
+                        <label for="inputUsername">Username</label>
+                    </div>
+
+                    <div class="form-floating mt-3">
+                        <input type="password" name="password" id="inputPassword" class="form-control"
+                               placeholder="Password" autocomplete="current-password" required>
+                        <label for="inputPassword">Password</label>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token"
+                           value="{{ csrf_token('authenticate') }}"
+                    >
+
+                    <div class="checkbox mb-3">
+                        <label>
+                            <input type="checkbox" name="_remember_me"> Remember me
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <a href="{{ path('forgot_password') }}">Forgot Password?</a>
+                    </div>
+
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+
+                    <p class="mt-5 mb-3 text-muted">&copy; Blogs 2024</p>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}
