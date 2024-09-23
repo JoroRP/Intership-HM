@@ -1,0 +1,32 @@
+.navbar {
+    background-color: #CD5241;
+    padding: 10px 0;
+}
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.navbar-nav {
+    margin: 0 auto;
+}
+
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.hero p {
+    font-size: 1.2rem;
+}
+
+.hero img {
+    max-width: 500px;
+    margin-right: 20px;
+}
+
+.card img {
+    height: 200px;
+    object-fit: cover;
+}

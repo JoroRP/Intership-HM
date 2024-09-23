@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Category Management{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Categories</h1>
+            <button class="btn btn-success" data-bs-toggle="collapse" href="#categoryFormWrapper" role="button"
+                    aria-expanded="false" aria-controls="categoryFormWrapper">Add New Category
+            </button>
+        </div>
+
+        <div id="flashMessages"></div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="categoryTableBody">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button id="prevPageBtn" class="btn btn-secondary">Previous</button>
+            <span id="paginationInfo"></span>
+            <button id="nextPageBtn" class="btn btn-secondary">Next</button>
+        </div>
+
+        <div class="collapse mt-5" id="categoryFormWrapper">
+            <div class="card card-body shadow-sm">
+                <h2 id="formTitle" class="mb-4">Add New Category</h2>
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+                    <div class="mb-3">
+                        <label for="name" class="form-label"><strong>Category Name:</strong></label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter category name"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label"><strong>Description:</strong></label>
+                        <textarea class="form-control" id="description" name="description"
+                                  placeholder="Enter category description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const limit = 5;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCategories();
+        });
+
+        function fetchCategories() {
+            fetch(`/api/categories?page=${currentPage}&limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('categoryTableBody');
+                    const paginationInfo = document.getElementById('paginationInfo');
+                    tableBody.innerHTML = '';
+
+                    data.categories.forEach(category => {
+                        const row = `<tr id="row-${category.id}">
+                    <td id="name-${category.id}">${category.name}</td>
+                    <td id="description-${category.id}">${category.description}</td>
+                    <td class="w-25">
+                        <button class="btn btn-warning btn-sm" id="edit-btn-${category.id}" onclick="editCategory(${category.id})">Edit</button>
+                        <button class="btn btn-success btn-sm d-none" id="save-btn-${category.id}" onclick="saveCategory(${category.id})">Save</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">Delete</button>
+                    </td>
+                </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    paginationInfo.textContent = `Page ${data.page} of ${data.totalPages}`;
+                    document.getElementById('prevPageBtn').disabled = data.page <= 1;
+                    document.getElementById('nextPageBtn').disabled = data.page >= data.totalPages;
+                });
+        }
+
+
+        document.getElementById('categoryForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById('categoryId').value;
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+
+            fetch('/api/categories/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, description})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        fetchCategories();
+                        document.getElementById('categoryForm').reset();
+                    }
+                });
+        });
+
+        function editCategory(id) {
+            const nameElement = document.getElementById(`name-${id}`);
+            const descriptionElement = document.getElementById(`description-${id}`);
+            const editButton = document.getElementById(`edit-btn-${id}`);
+            const saveButton = document.getElementById(`save-btn-${id}`);
+
+            nameElement.innerHTML = `<input type="text" class="form-control" value="${nameElement.textContent}" id="edit-name-${id}">`;
+            descriptionElement.innerHTML = `<textarea class="form-control">${descriptionElement.textContent}</textarea>`;
+
+            editButton.classList.add('d-none');
+            saveButton.classList.remove('d-none');
+        }
+
+        function saveCategory(id) {
+            const updatedName = document.getElementById(`edit-name-${id}`).value;
+            const updatedDescription = document.getElementById(`description-${id}`).querySelector('textarea').value;
+
+            fetch(`/api/categories/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name: updatedName, description: updatedDescription})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        fetchCategories();
+                    }
+                });
+        }
+
+        function deleteCategory(id) {
+            if (!confirm('Are you sure you want to delete this category?')) return;
+
+            fetch(`/api/categories/${id}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    showAlert('success', data.success);
+                    fetchCategories();
+                });
+        }
+
+        document.getElementById('prevPageBtn').addEventListener('click', function () {
+            currentPage--;
+            fetchCategories();
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', function () {
+            currentPage++;
+            fetchCategories();
+        });
+
+        function showAlert(type, message) {
+            const flashMessages = document.getElementById('flashMessages');
+            flashMessages.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => flashMessages.innerHTML = '', 3000);
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customer Management{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Customers</h1>
+            <button class="btn btn-success" data-bs-toggle="collapse" href="#customerFormWrapper" role="button"
+                    aria-expanded="false" aria-controls="customerFormWrapper">Add New Customer
+            </button>
+        </div>
+
+        <div id="flashMessages"></div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="customerTableBody">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button id="prevPageBtn" class="btn btn-secondary">Previous</button>
+            <span id="paginationInfo"></span>
+            <button id="nextPageBtn" class="btn btn-secondary">Next</button>
+        </div>
+
+        <div class="collapse mt-5" id="customerFormWrapper">
+            <div class="card card-body shadow-sm">
+                <h2 id="formTitle" class="mb-4">Add New Customer</h2>
+                <form id="customerForm">
+                    <input type="hidden" id="customerId">
+                    <div class="mb-3">
+                        <label for="name" class="form-label"><strong>Customer Name:</strong></label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter customer name"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label"><strong>Email:</strong></label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="Enter customer email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label"><strong>Address:</strong></label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               placeholder="Enter customer address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label"><strong>Phone:</strong></label>
+                        <input type="text" class="form-control" id="phone" name="phone"
+                               placeholder="Enter customer phone">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const limit = 5;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCustomers();
+        });
+
+        function fetchCustomers() {
+            fetch(`/api/customers?page=${currentPage}&limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('customerTableBody');
+                    const paginationInfo = document.getElementById('paginationInfo');
+                    tableBody.innerHTML = '';
+
+                    data.customers.forEach(customer => {
+                        const row = `<tr id="row-${customer.id}">
+                            <td id="name-${customer.id}">${customer.name}</td>
+                            <td id="email-${customer.id}">${customer.email}</td>
+                            <td id="address-${customer.id}">${customer.address}</td>
+                            <td id="phone-${customer.id}">${customer.phone ?? ''}</td>
+                            <td  class="w-25">
+                                <button class="btn btn-warning btn-sm" onclick="editCustomer(${customer.id})">Edit</button>
+                                <button class="btn btn-success btn-sm d-none" id="save-btn-${customer.id}" onclick="saveCustomer(${customer.id})">Save</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${customer.id})">Delete</button>
+                            </td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    paginationInfo.textContent = `Page ${data.page} of ${data.totalPages}`;
+                    document.getElementById('prevPageBtn').disabled = data.page <= 1;
+                    document.getElementById('nextPageBtn').disabled = data.page >= data.totalPages;
+                });
+        }
+
+        document.getElementById('customerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById('customerId').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+
+            fetch('/api/customers/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, email, address, phone})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        fetchCustomers();
+                        document.getElementById('customerForm').reset();
+                        document.getElementById('customerFormWrapper').classList.remove('show');
+                    }
+                });
+        });
+
+        function editCustomer(id) {
+            const nameElement = document.getElementById(`name-${id}`);
+            const emailElement = document.getElementById(`email-${id}`);
+            const addressElement = document.getElementById(`address-${id}`);
+            const phoneElement = document.getElementById(`phone-${id}`);
+            const editButton = document.querySelector(`#row-${id} .btn-warning`);
+            const saveButton = document.getElementById(`save-btn-${id}`);
+
+            nameElement.innerHTML = `<input type="text" class="form-control" value="${nameElement.textContent}" id="edit-name-${id}">`;
+            emailElement.innerHTML = `<input type="email" class="form-control" value="${emailElement.textContent}" id="edit-email-${id}">`;
+            addressElement.innerHTML = `<input type="text" class="form-control" value="${addressElement.textContent}" id="edit-address-${id}">`;
+            phoneElement.innerHTML = `<input type="text" class="form-control" value="${phoneElement.textContent}" id="edit-phone-${id}">`;
+
+            editButton.classList.add('d-none');
+            saveButton.classList.remove('d-none');
+        }
+
+        function saveCustomer(id) {
+            const updatedName = document.getElementById(`edit-name-${id}`).value;
+            const updatedEmail = document.getElementById(`edit-email-${id}`).value;
+            const updatedAddress = document.getElementById(`edit-address-${id}`).value;
+            const updatedPhone = document.getElementById(`edit-phone-${id}`).value;
+
+            fetch(`/api/customers/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: updatedName,
+                    email: updatedEmail,
+                    address: updatedAddress,
+                    phone: updatedPhone
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        fetchCustomers();
+                    }
+                });
+        }
+
+        function deleteCustomer(id) {
+            if (!confirm('Are you sure you want to delete this customer?')) return;
+
+            fetch(`/api/customers/${id}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.success);
+                        fetchCustomers();
+                    }
+                });
+        }
+
+
+        function showAlert(type, message) {
+            const flashMessages = document.getElementById('flashMessages');
+            flashMessages.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => flashMessages.innerHTML = '', 3000);
+        }
+
+        document.getElementById('prevPageBtn').addEventListener('click', function () {
+            currentPage--;
+            fetchCustomers();
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', function () {
+            currentPage++;
+            fetchCustomers();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Management{% endblock %}
+
+{% block body %}
+    <div class="container py-5 px-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Products</h1>
+            <button class="btn btn-success" data-bs-toggle="collapse" href="#productFormWrapper" role="button"
+                    aria-expanded="false" aria-controls="productFormWrapper">Add New Product
+            </button>
+        </div>
+
+        <div id="flashMessages"></div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Categories</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="productTableBody">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button id="prevPageBtn" class="btn btn-secondary">Previous</button>
+            <span id="paginationInfo"></span>
+            <button id="nextPageBtn" class="btn btn-secondary">Next</button>
+        </div>
+
+        <div class="collapse mt-5" id="productFormWrapper">
+            <div class="card card-body shadow-sm">
+                <h2 id="formTitle" class="mb-4">Add New Product</h2>
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    <div class="mb-3">
+                        <label for="name" class="form-label"><strong>Product Name:</strong></label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter product name"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label"><strong>Price:</strong></label>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price"
+                               placeholder="Enter product price" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label"><strong>Quantity:</strong></label>
+                        <input type="number" class="form-control" id="quantity" name="quantity"
+                               placeholder="Enter product quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label"><strong>Description:</strong></label>
+                        <textarea class="form-control" id="description" name="description"
+                                  placeholder="Enter product description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categories" class="form-label"><strong>Categories:</strong></label>
+                        <div id="categoryCheckboxes" class="form-check"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const limit = 5;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProductCategories();
+            fetchProducts();
+        });
+
+        function fetchProductCategories() {
+            fetch('/api/products/category')
+                .then(response => response.json())
+                .then(categories => {
+                    const categoryCheckboxes = document.getElementById('categoryCheckboxes');
+                    categoryCheckboxes.innerHTML = '';
+
+                    categories.forEach(category => {
+                        const checkbox = `<div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="category-${category.id}" value="${category.id}">
+                            <label class="form-check-label" for="category-${category.id}">
+                                ${category.name}
+                            </label>
+                        </div>`;
+                        categoryCheckboxes.innerHTML += checkbox;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                });
+        }
+
+        function fetchProducts() {
+            fetch(`/api/products?page=${currentPage}&limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('productTableBody');
+                    const paginationInfo = document.getElementById('paginationInfo');
+                    tableBody.innerHTML = '';
+
+                    if (data.products && data.products.length > 0) {
+                        data.products.forEach(product => {
+                            const categories = product.categories ? product.categories.map(category => category.name).join(', ') : 'No categories';
+
+                            const row = `<tr id="row-${product.id}">
+                                <td id="name-${product.id}">${product.name}</td>
+                                <td id="price-${product.id}">${product.price}</td>
+                                <td id="quantity-${product.id}">${product.quantity}</td>
+                                <td id="description-${product.id}">${product.description ?? ''}</td>
+                                <td id="categories-${product.id}">${categories || 'No categories'}</td>
+                                <td class="w-25">
+                                    <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})">Edit</button>
+                                    <button class="btn btn-success btn-sm d-none" id="save-btn-${product.id}" onclick="saveProduct(${product.id})">Save</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Delete</button>
+                                </td>
+                            </tr>`;
+                            tableBody.innerHTML += row;
+                        });
+
+                        paginationInfo.textContent = `Page ${data.page} of ${data.totalPages}`;
+                        document.getElementById('prevPageBtn').disabled = data.page <= 1;
+                        document.getElementById('nextPageBtn').disabled = data.page >= data.totalPages;
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No products available</td></tr>';
+                        paginationInfo.textContent = 'No products found';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        document.getElementById('productForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+            const description = document.getElementById('description').value;
+            const selectedCategories = Array.from(document.querySelectorAll('#categoryCheckboxes input:checked'))
+                .map(checkbox => checkbox.value);
+
+            fetch('/api/products/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, price, quantity, description, categories: selectedCategories})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        document.getElementById('productForm').reset();
+                        document.getElementById('productFormWrapper').classList.remove('show');
+
+                        currentPage = 1;
+                        fetchProducts();
+                    }
+                });
+        });
+
+        function saveProduct(id) {
+            const updatedName = document.getElementById(`edit-name-${id}`).value;
+            const updatedPrice = document.getElementById(`edit-price-${id}`).value;
+            const updatedQuantity = document.getElementById(`edit-quantity-${id}`).value;
+            const updatedDescription = document.getElementById(`edit-description-${id}`).value;
+            const selectedCategories = Array.from(document.querySelectorAll('#categoryCheckboxes input:checked')).map(checkbox => checkbox.value);
+
+            fetch(`/api/products/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: updatedName,
+                    price: updatedPrice,
+                    quantity: updatedQuantity,
+                    description: updatedDescription,
+                    categories: selectedCategories
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('danger', data.error);
+                    } else {
+                        showAlert('success', data.success);
+                        fetchProducts();
+                    }
+                });
+        }
+
+        function editProduct(id) {
+            const nameElement = document.getElementById(`name-${id}`);
+            const priceElement = document.getElementById(`price-${id}`);
+            const quantityElement = document.getElementById(`quantity-${id}`);
+            const descriptionElement = document.getElementById(`description-${id}`);
+            const editButton = document.querySelector(`#row-${id} .btn-warning`);
+            const saveButton = document.getElementById(`save-btn-${id}`);
+
+            nameElement.innerHTML = `<input type="text" class="form-control" value="${nameElement.textContent}" id="edit-name-${id}">`;
+            priceElement.innerHTML = `<input type="number" step="0.01" class="form-control" value="${priceElement.textContent}" id="edit-price-${id}">`;
+            quantityElement.innerHTML = `<input type="number" class="form-control" value="${quantityElement.textContent}" id="edit-quantity-${id}">`;
+            descriptionElement.innerHTML = `<input type="text" class="form-control" value="${descriptionElement.textContent}" id="edit-description-${id}">`;
+
+            editButton.classList.add('d-none');
+            saveButton.classList.remove('d-none');
+        }
+
+
+        function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+
+            fetch(`/api/products/${id}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.success);
+                        fetchProducts();
+                    } else {
+                        showAlert('danger', data.error);
+                    }
+                });
+        }
+
+
+        function showAlert(type, message) {
+            const flashMessages = document.getElementById('flashMessages');
+            flashMessages.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => flashMessages.innerHTML = '', 3000);
+        }
+
+        document.getElementById('prevPageBtn').addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchProducts();
+            }
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', function () {
+            currentPage++;
+            fetchProducts();
+        });
+    </script>
+{% endblock %}
