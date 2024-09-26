@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pokemon Memory Game</title>
+	
+	<link rel="icon" type="image/x-icon" href="Assets/insignia.png">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+		  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+		  crossorigin="anonymous">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+		  rel="stylesheet">
+	<link rel="stylesheet" href="CSS/Custom.css">
+
+
+</head>
+<body class="text-white">
+<h1 class="mt-5">Pokemon Memory Game</h1>
+
+<div class="nav-panel">
+	<div class="dropdown ">
+		<label for="gridSize">Choose Grid Size:</label>
+		<select id="gridSize">
+			<option value="2x3">2x3</option>
+			<option value="4x4" selected>4x4</option>
+		</select>
+	</div>
+	<button class="start-btn" id="startBtn">Start Game</button>
+	<div class="timer">Time left: <span id="time">30</span> seconds</div>
+</div>
+
+<div class="message-lose" id="message-l">You lose!</div>
+<div class="message-win" id="message-w">Congratulations! You win!</div>
+
+<div class="grid"></div>
+
+<script>
+    const grid = document.querySelector('.grid');
+    const timerDisplay = document.getElementById('time');
+    const messageLDisplay = document.getElementById('message-l');
+    const messageWDisplay = document.getElementById('message-w');
+    const startBtn = document.getElementById('startBtn');
+    const gridSizeDropdown = document.getElementById('gridSize');
+    const totalPairsMap = {'2x3': 3, '4x4': 8};
+    let totalPairs;
+    let pokemons = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let maxPokemonID = 300;
+    let timer;
+    let timeLeft = 30;
+    let gameOver = false;
+
+    startBtn.addEventListener('click', startGame);
+
+    function startGame() {
+        const selectedGridSize = gridSizeDropdown.value;
+        totalPairs = totalPairsMap[selectedGridSize];
+
+        pokemons = [];
+        flippedCards = [];
+        matchedPairs = 0;
+        gameOver = false;
+
+        setGridLayout(selectedGridSize);
+        startBtn.style.display = 'none';
+        messageWDisplay.style.display = 'none';
+        messageLDisplay.style.display = 'none';
+
+        resetGame();
+        initializeGame();
+    }
+
+
+    function setGridLayout(gridSize) {
+        if (gridSize === '2x3') {
+            grid.style.gridTemplateColumns = 'repeat(3, 150px)';
+            grid.style.gridTemplateRows = 'repeat(2, 150px)';
+        } else if (gridSize === '4x4') {
+            grid.style.gridTemplateColumns = 'repeat(4, 150px)';
+            grid.style.gridTemplateRows = 'repeat(4, 150px)';
+        }
+    }
+
+    async function fetchPokemon(id) {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await response.json();
+        return data.sprites.other.dream_world.front_default;
+    }
+
+    async function initializeGame() {
+        const selectedPokemonIds = new Set();
+
+        while (selectedPokemonIds.size < totalPairs) {
+            const randomId = Math.floor(Math.random() * maxPokemonID) + 1;
+            selectedPokemonIds.add(randomId);
+        }
+
+        for (let id of selectedPokemonIds) {
+            const pokemonImage = await fetchPokemon(id);
+            pokemons.push(pokemonImage, pokemonImage);
+        }
+
+        pokemons = shuffle(pokemons);
+        createGrid();
+        startTimer();
+    }
+
+    function createGrid() {
+        grid.innerHTML = '';
+
+        pokemons.forEach((pokemon, index) => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.index = index;
+            card.addEventListener('click', flipCard);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard(e) {
+        const card = e.target;
+        const index = card.dataset.index;
+
+        if (gameOver || flippedCards.includes(card) || card.classList.contains('hidden')) {
+            return;
+        }
+
+        card.classList.add('flipped');
+        card.style.backgroundImage = `url(${pokemons[index]})`;
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const [firstCard, secondCard] = flippedCards;
+        const firstImage = pokemons[firstCard.dataset.index];
+        const secondImage = pokemons[secondCard.dataset.index];
+
+        if (firstImage === secondImage) {
+            firstCard.classList.add('hidden');
+            secondCard.classList.add('hidden');
+            matchedPairs++;
+            if (matchedPairs === totalPairs) {
+                gameOver = true;
+                clearInterval(timer);
+                showWinMessage();
+            }
+        } else {
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard.style.backgroundImage = '';
+                secondCard.style.backgroundImage = '';
+            }, 1000);
+        }
+        flippedCards = [];
+    }
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startTimer() {
+        timeLeft = 30;
+        gameOver = false;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                gameOver = true;
+                showLoseMessage();
+            }
+        }, 1000);
+    }
+
+    function showLoseMessage() {
+        const allCards = document.querySelectorAll('.card');
+        allCards.forEach(card => {
+            card.style.visibility = 'hidden';
+        });
+
+        messageLDisplay.style.display = 'block';
+        resetGame();
+    }
+
+    function showWinMessage() {
+        const allCards = document.querySelectorAll('.card');
+        allCards.forEach(card => {
+            card.style.visibility = 'hidden';
+        });
+
+        messageWDisplay.style.display = 'block';
+        resetGame();
+    }
+
+    function resetGame() {
+        const allCards = document.querySelectorAll('.card');
+        allCards.forEach(card => card.removeEventListener('click', flipCard));
+        startBtn.style.display = 'block';
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

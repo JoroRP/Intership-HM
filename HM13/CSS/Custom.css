@@ -1,0 +1,95 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #0f224a;
+}
+
+.nav-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #1f386a;
+    border-radius: 10px;
+}
+
+.grid {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.card {
+    width: 150px;
+    height: 150px;
+    text-align: center;
+    line-height: 150px;
+    cursor: pointer;
+    background: rgb(182, 71, 172);
+    background: url("../Assets/pokeball.png") center,
+    linear-gradient(45deg, rgba(182, 71, 172, 1) 0%, rgba(247, 180, 86, 1) 100%);
+    background-size: cover;
+}
+
+.card.flipped {
+    background-color: white;
+    background-image: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.timer {
+    font-size: 24px;
+    color: white;
+}
+
+.message-lose {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    color: red;
+    display: none;
+}
+
+.message-win {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    color: green;
+    display: none;
+}
+
+.start-btn {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.dropdown {
+    display: flex;
+    align-items: center;
+}
+
+.dropdown select {
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: white;
+}
